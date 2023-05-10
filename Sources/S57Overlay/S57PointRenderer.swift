@@ -344,6 +344,9 @@ struct S57PointRenderer {
         case 144:   // Top Marks are not used asa they are already codified in beacon / buoy
             return nil
             
+        case 158:   // Week / kelp
+            return "WEDKLP03"
+            
         default:
         
             return "X"  // Deault Not Found, a circle in black with magenta center
