@@ -345,7 +345,7 @@ struct S57PointRenderer {
             return nil
             
         case 158:   // Week / kelp
-            return "WEDKLP03"
+            return "WEDKLP03" 
             
         default:
         
