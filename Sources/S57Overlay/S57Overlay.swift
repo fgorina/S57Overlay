@@ -377,8 +377,8 @@ public class S57OverlayRenderer : MKOverlayRenderer {
         
         let cgPoint = self.point(for: point)
         let bundle = Bundle.module
-        if  let url = bundle.urlForImageResource(imageName){
-            if let nsImage = NSImage(contentsOf: url){
+      
+        if let nsImage = bundle.image(imageName){
                 let imageSize = nsImage.size
                 //et proposedSize = context.convertToUserSpace(imageSize)
                 //let relativeSize = 1.0
@@ -391,7 +391,7 @@ public class S57OverlayRenderer : MKOverlayRenderer {
                 NSGraphicsContext.current = nsContext
                 nsImage.draw(in: someRect)
                 NSGraphicsContext.current = old
-            }
+           
             
         }else{
             
