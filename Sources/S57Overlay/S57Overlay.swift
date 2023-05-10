@@ -407,7 +407,8 @@ public class S57OverlayRenderer : MKOverlayRenderer {
         
         let cgPoint = self.point(for: point)
         
-        if let uiImage = UIImage(named: imageName){
+        if let uiImage = UIImage(named: imageName, in: Bundle.module, with: nil){
+            
             let imageSize = uiImage.size
             
             context.saveGState()
