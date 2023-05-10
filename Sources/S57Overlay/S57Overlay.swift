@@ -10,23 +10,24 @@ import MapKit
 import S57Parser
 
 
-enum S57OverlayError : Error{
+public enum S57OverlayError : Error{
     case emptyFeatures
     case noGeometricRegions
     case notEnoughCoordinates
 }
 @available(iOS 13.0, *)
 @available(macOS 10.15, *)
-class S57Overlay : NSObject, MKOverlay{
+
+public class S57Overlay : NSObject, MKOverlay{
     
     
-    var coordinate: CLLocationCoordinate2D
-    var boundingMapRect: MKMapRect
+    public var coordinate: CLLocationCoordinate2D
+    public var boundingMapRect: MKMapRect
     
     
     var features : [any S57Displayable]
     
-    init(_ features : [any S57Displayable])  throws {
+    public init(_ features : [any S57Displayable])  throws {
         
         if features.isEmpty {
             throw S57OverlayError.emptyFeatures
@@ -46,7 +47,7 @@ class S57Overlay : NSObject, MKOverlay{
         super.init()
     }
     
-    func canReplaceMapContent() -> Bool {
+    public func canReplaceMapContent() -> Bool {
         return false
     }
 }
@@ -54,7 +55,7 @@ class S57Overlay : NSObject, MKOverlay{
 @available(iOS 13.0, *)
 @available(macOS 12.15, *)
 
-class S57OverlayRenderer : MKOverlayRenderer {
+public class S57OverlayRenderer : MKOverlayRenderer {
     let red = CGColor(red: 1.0, green: 0.0, blue: 0.0, alpha: 1.0)
     let black = CGColor(red: 0.0, green: 0.0, blue: 0.0, alpha: 1.0)
     let magenta = CGColor(red: 1.0, green: 0.0, blue: 1.0, alpha: 0.5)
@@ -65,7 +66,7 @@ class S57OverlayRenderer : MKOverlayRenderer {
     let contourColor = CGColor(red: 107.0/255.0, green: 118.0/155.0, blue: 107.0/256.0, alpha: 1.0)
     
     
-    override func draw(_ rect: MKMapRect, zoomScale: MKZoomScale, in context: CGContext){
+    public override func draw(_ rect: MKMapRect, zoomScale: MKZoomScale, in context: CGContext){
         
         guard let overlay = overlay as? S57Overlay else { return }
         
