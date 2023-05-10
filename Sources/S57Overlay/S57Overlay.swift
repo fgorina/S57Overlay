@@ -385,7 +385,6 @@ public class S57OverlayRenderer : MKOverlayRenderer {
                 let baseSize = context.convertToUserSpace(imageSize)
                 let factor = 1.0
                 let someRect = CGRect(x: cgPoint.x - baseSize.width/2.0/factor, y: cgPoint.y - baseSize.height/2.0/factor, width: baseSize.width/factor, height: baseSize.height/factor)
-                 
                 
                 let old = NSGraphicsContext.current
                 let nsContext = NSGraphicsContext(cgContext: context, flipped: true)
