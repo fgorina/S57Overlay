@@ -1,3 +1,5 @@
 # S57Overlay
 
-A description of this package.
+Un MKOverlay amb un MKOverlayRenderer for S57 feature data
+
+

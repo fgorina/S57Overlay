@@ -12,6 +12,7 @@ let package = Package(
             targets: ["S57Overlay"]),
     ],
     dependencies: [
+        .package(url: "https://github.com/fgorina/S57Parser.git", branch: ("main")),
         // Dependencies declare other packages that this package depends on.
         // .package(url: /* package url */, from: "1.0.0"),
     ],
@@ -20,9 +21,9 @@ let package = Package(
         // Targets can depend on other targets in this package, and on products in packages this package depends on.
         .target(
             name: "S57Overlay",
-            dependencies: []),
+            dependencies: ["S57Parser"]),
         .testTarget(
             name: "S57OverlayTests",
-            dependencies: ["S57Overlay"]),
+            dependencies: ["S57Overlay", "S57Parser"]),
     ]
 )
