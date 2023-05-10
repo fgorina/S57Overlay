@@ -1,0 +1,14 @@
+{
+  "pins" : [
+    {
+      "identity" : "s57parser",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/fgorina/S57Parser.git",
+      "state" : {
+        "branch" : "main",
+        "revision" : "4099481c2c563380c9b13b74c5b153a9ba8d2a5b"
+      }
+    }
+  ],
+  "version" : 2
+}
