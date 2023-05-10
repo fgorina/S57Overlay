@@ -376,7 +376,8 @@ public class S57OverlayRenderer : MKOverlayRenderer {
         
         
         let cgPoint = self.point(for: point)
-        if let nsImage = NSImage(named: imageName){
+        if  let path = Bundle.module.path(forResource: imageName, ofType: "svg"){
+        if let nsImage = NSImage(contentsOfFile: path){
             let imageSize = nsImage.size
             //et proposedSize = context.convertToUserSpace(imageSize)
             //let relativeSize = 1.0
@@ -390,6 +391,7 @@ public class S57OverlayRenderer : MKOverlayRenderer {
             NSGraphicsContext.current = nsContext
             nsImage.draw(in: someRect)
             NSGraphicsContext.current = old
+        }
             
         }else{
             
