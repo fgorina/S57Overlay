@@ -231,7 +231,7 @@ public class S57OverlayRenderer : MKOverlayRenderer {
     private func drawLine(_ feature : any S57Displayable, rect : MKMapRect,zoomScale: MKZoomScale, context: CGContext){
         
         context.saveGState()
-
+        
         if let points = feature.points{
             
             let p0 = points[0]
@@ -376,22 +376,22 @@ public class S57OverlayRenderer : MKOverlayRenderer {
         
         
         let cgPoint = self.point(for: point)
-        if  let path = Bundle.module.path(forResource: imageName, ofType: "svg"){
-        if let nsImage = NSImage(contentsOfFile: path){
-            let imageSize = nsImage.size
-            //et proposedSize = context.convertToUserSpace(imageSize)
-            //let relativeSize = 1.0
-            let baseSize = context.convertToUserSpace(imageSize)
-            let factor = 1.0
-            let someRect = CGRect(x: cgPoint.x - baseSize.width/2.0/factor, y: cgPoint.y - baseSize.height/2.0/factor, width: baseSize.width/factor, height: baseSize.height/factor)
-            
-            
-            let old = NSGraphicsContext.current
-            let nsContext = NSGraphicsContext(cgContext: context, flipped: true)
-            NSGraphicsContext.current = nsContext
-            nsImage.draw(in: someRect)
-            NSGraphicsContext.current = old
-        }
+        if  let url = Bundle.module.url(forResource: imageName, withExtension: "svg"){
+            if let nsImage = NSImage(contentsOf: url){
+                let imageSize = nsImage.size
+                //et proposedSize = context.convertToUserSpace(imageSize)
+                //let relativeSize = 1.0
+                let baseSize = context.convertToUserSpace(imageSize)
+                let factor = 1.0
+                let someRect = CGRect(x: cgPoint.x - baseSize.width/2.0/factor, y: cgPoint.y - baseSize.height/2.0/factor, width: baseSize.width/factor, height: baseSize.height/factor)
+                
+                
+                let old = NSGraphicsContext.current
+                let nsContext = NSGraphicsContext(cgContext: context, flipped: true)
+                NSGraphicsContext.current = nsContext
+                nsImage.draw(in: someRect)
+                NSGraphicsContext.current = old
+            }
             
         }else{
             
