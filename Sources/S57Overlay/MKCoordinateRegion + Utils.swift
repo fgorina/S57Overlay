@@ -10,7 +10,7 @@ import MapKit
 
 public extension MKCoordinateRegion {
     
-     static var world = MKCoordinateRegion(top: 50, left: -20, bottom: -50, right: 20)
+     public static var world = MKCoordinateRegion(top: 50, left: -20, bottom: -50, right: 20)
     
     var topLeft : CLLocationCoordinate2D {
         return CLLocationCoordinate2D(latitude: center.latitude + span.latitudeDelta / 2.0,
