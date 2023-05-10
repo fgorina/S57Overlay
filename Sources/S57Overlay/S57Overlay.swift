@@ -1,430 +1,439 @@
 //
-//  S57PointRenderer.swift
-//
-//  Interprets a feature with point gepometry and returns the appropiate image name
-//
-//  Images MUST be in the assets catalog with teh correct name and ideally as svg
-//
+//  S57Overlay.swift
 //  S57Browser
 //
-//  Created by Francisco Gorina Vanrell on 5/5/23.
+//  Created by Francisco Gorina Vanrell on 26/4/23.
 //
 
 import Foundation
-import S57Parser
 import MapKit
+import S57Parser
 
 
-
-struct S57PointRenderer {
+enum S57OverlayError : Error{
+    case emptyFeatures
+    case noGeometricRegions
+    case notEnoughCoordinates
+}
+@available(iOS 13.0, *)
+@available(macOS 10.15, *)
+class S57Overlay : NSObject, MKOverlay{
     
-    static func colorForItem(_ item : any S57Displayable) -> CGColor{
+    
+    var coordinate: CLLocationCoordinate2D
+    var boundingMapRect: MKMapRect
+    
+    
+    var features : [any S57Displayable]
+    
+    init(_ features : [any S57Displayable])  throws {
         
-        if let f = item as? S57Feature{
-            
-            
-            
-            
-            if f.prim == .line {
-                return CGColor(red: 107.0/255.0, green: 118.0/255.0, blue: 107.0/255.0, alpha: 1.0)
-            }
-            
-            switch f.objl{
-            
-            case 13:    // Build Area
-                return CGColor(red: 181.0/255.0, green: 147.0/255.0, blue: 59.0/255.0, alpha: 1.0)
-                
-            case 42:    // Depth Area
-                let v = Double(f.attributes[87]?.value ?? "0") ?? 0.0 // Minimum value
-                
-                if v >= 30.0 {
-                    return CGColor(red: 220.0/255.0, green: 228.0/255.0, blue: 200.0/255.0, alpha: 1.0)
-                }else {
-                    return CGColor(red: 197.0/255.0, green: 210.0/255.0, blue: 191.0/255.0, alpha: 1.0)
-                }
-                
-            case 71:    // Land Area
-                return CGColor(red: 203.0/255.0, green: 183.0/255.0, blue: 112.0/255.0, alpha: 1.0)
-
-            case 86:    // Obstruction
-                return CGColor(red: 129.0/255.0, green: 194.0/255.0, blue: 225.0/255.0, alpha: 1.0)
-                
-                
-            case 121:       // Sea Bed Area
-                let v = f.attributes[187]?.value ?? "0"
-                
-                if v == "4" {
-                    return CGColor(red: 147.0/255.0, green: 180.0/255.0, blue: 133.0/255.0, alpha: 1.0)
-
-                }else{
-                    return CGColor(red: 1.0, green: 1.0, blue: 1.0, alpha: 0.0)
-                }
-                
-             
-            default:
-                return CGColor(red: 1.0, green: 0.0, blue: 1.0, alpha: 0.5)
-                
-            }
-            
-            
-            
-            
-            
-            
-            
-        }else{
-            return CGColor(red: 1.0, green:0.0, blue: 0.0, alpha: 1.0)
+        if features.isEmpty {
+            throw S57OverlayError.emptyFeatures
         }
         
+        self.features = features
+        
+        let regions = features.compactMap { f in f.region }
+        guard !regions.isEmpty else {throw S57OverlayError.noGeometricRegions}
+        
+        boundingMapRect = regions[0].mapRect
+        for someRegion in regions{
+            boundingMapRect = boundingMapRect.union(someRegion.mapRect)
+        }
+        
+        coordinate = MKCoordinateRegion(boundingMapRect).center
+        super.init()
     }
     
-    static func imageForFeature(_ feature : S57Feature) -> String?{
+    func canReplaceMapContent() -> Bool {
+        return false
+    }
+}
+
+@available(iOS 13.0, *)
+@available(macOS 12.15, *)
+
+class S57OverlayRenderer : MKOverlayRenderer {
+    let red = CGColor(red: 1.0, green: 0.0, blue: 0.0, alpha: 1.0)
+    let black = CGColor(red: 0.0, green: 0.0, blue: 0.0, alpha: 1.0)
+    let magenta = CGColor(red: 1.0, green: 0.0, blue: 1.0, alpha: 0.5)
+    
+    let fontName = "Futura" as CFString // Avenir
+    
+    
+    let contourColor = CGColor(red: 107.0/255.0, green: 118.0/155.0, blue: 107.0/256.0, alpha: 1.0)
+    
+    
+    override func draw(_ rect: MKMapRect, zoomScale: MKZoomScale, in context: CGContext){
         
-        switch feature.objl{
-            
-        case 2:
-            return "AIRARE02"
-            
-        case 4:
-            return "ACHARE02"
-            
-        case 5: // Beacon Cardinal
-            let category = feature.attributes[13]?.value ?? "" // Category
-            return "BCNCAR0\(category)"
-            // Idealment deuriem modificar en funció del tipus
-            
-            
-        case 6: // Single danger
-            return "BCNISD21"
-            
-        case 7: // Beacon Lateral
-            let ctype = feature.attributes[2]?.value    // Support Type
-            var type = "Stake"
-            if ctype == "1"{
-                
-            }else{
-                
-            }
-     
-               
-                
-            let ccategory = feature.attributes[36]?.value // Category
-            // Idealment deuriem modificar en funció del tipus
-            var category = "Lateral_Pillar_PreferredChannel_Port"
-            switch ccategory {
-            case "1" :
-                return "BCNLAT15"
-            case "2":
-                return "BCNLAT16"
-                
-            case "3" :
-                return "BCNLAT15S"
-                
-            case "4":
-                return "BCNLAT16B"
-                
-            default:
-                return "BCNLAT15"
-                
-            }
-            
-        case 8: // Beacon Safe Water
-                return "BCNSAW13"
-
-          
-        case 9: // Beacon Special Purpose
-                return "BCNSPP13"
-            
-        case 12:    // Building, single
-            return "BUISGL01"       // Add treatment for function
-            
-        case 14: // Buoy Cardinal
-            let category = feature.attributes[13]?.value ?? "" // Category
-            return "BOYCAR0\(category)"
-            
-        case 15:  // Buoy Installation
-            let buoyShape = feature.attributes[4]?.value ?? ""
-            if buoyShape == "7"{
-                return "BOYSUP02"
-            }else{
-                return "BOYDEF03"
-            }
-            
-        case 16:        // Buoy Isolated Danger
-            return "BOYISD12"
-
-            
-            
-        case 17: // Buoy Lateral
-        let ctype = feature.attributes[4]?.value    // Support Type
-        var type = "Stake"
-        if ctype == "1"{
-            
-        }else{
-            
-        }
- 
-           
-            
-        let ccategory = feature.attributes[36]?.value // Category
-        // Idealment deuriem modificar en funció del tipus
+        guard let overlay = overlay as? S57Overlay else { return }
         
-        switch ccategory {
-        case "1" :
-            return "BOYLAT13"
-        case "2":
-            return "BOYLAT14"
-            
-        case "3" :
-            return "BOYLAT14"
-            
-        case "4":
-            return "BOYLAT13"
-            
-        default:
-            return "BCNLAT15"
-            
-        }
-
-            
+        // Font Size changes with zoomScale :(
+        let fontSmall = CTFontCreateWithName(fontName, 6.0 / zoomScale, nil)
+        let fontBig = CTFontCreateWithName(fontName, 8.0 / zoomScale, nil)
         
-        case 18:    // Buoy SafeWater
-            return "BOYSAW12"
+        // Draw rect to show size of cells. Comment after
+        //drawRect(rect, zoomScale: zoomScale, context: context)
+        
+        // Scale: 1:scale suposes a 72 ppi and uses center of rect for latitude.
+        
+        let region = MKCoordinateRegion(rect)
+        let scale = (72.0 * 1000.0)/(25.4 * zoomScale * MKMapPointsPerMeterAtLatitude(region.center.latitude))
+        
+        
+        for feature in overlay.features{
             
-        case 19:    // Buoy SpecialPurpose
-            
-            let buoyShape = feature.attributes[4]?.value ?? ""
-            if buoyShape == "7"{
-                return "BOYSUP02"
-            }else{
-                return "BOYSPP11"
-            }
-            
-        case 58: // Fog Signal
-            return "FOGSIG01"
-            
-        case 59: // Fortified Structure
-            return "FORSTC01"
-            
-        case 64:    // Harbour
-            let ctype = feature.attributes[30]?.value
-            
-            switch ctype {
+            if let featureRect = mapRect(feature, context: context){
                 
-            
-            case "4" :
-                return "HRBFAC09"
-            case "5":
-                return "SMCFAC02"
-                
-            default:
-                return "SMCFAC02"
-            }
-            
-        case 72: // Land Elevation
-            
-            return "POSGEN04"
-            
-            
-        case 74:    // Landmark
-            let ctype = feature.attributes[35]?.value
-            let conspiscuous = feature.attributes[83]?.value ?? "" == "1"
-            
-            switch ctype {
-            case "1":
-                return conspiscuous ? "CAIRNS11" : "CAIRNS01"
-                
-            case "3":
-                return conspiscuous ? "CHIMNY11" : "CHIMNY01"
-                
-            case "9":
-                return conspiscuous ? "MONUMT12" : "MONUMT02"
-
-            case "17":
-                return conspiscuous ? "TOWERS03" : "TOWERS01"
-                
-            default:
-                return conspiscuous ? "TOWERS03" : "TOWERS01"
-                
-            }
-            
-        case 75:    // Lights
-            let color = feature.attributes[75]?.value
-            
-            switch color {
-                
-            case "0", "6":
-                return "LIGHTS13_1"
-                
-            case "3":
-                return "LIGHTS11_1"
-                
-            case "4":
-                return "LIGHTS12_1"
-                
-            default:
-                return "LIGHTS13_1"
-                
-            }
-            
-        case 81:
-            return "MAGVAR01"
-            
-        case 82:    // Fish Factory
-            return "MARCUL"
-            
-        case 86, 159, 153:    // Obstruction, Wreck
-            let category = feature.attributes[42]?.value
-            let waterLevelEffect = feature.attributes[187]?.value ?? ""
-            let sounding = feature.attributes[179]?.value ?? ""
-            
-            switch category {
-                                
-            case "5":
-                return "FSHHAV01"
-                 
-            case "7":
-                return "FOULGND1"
-                
-            default:
-                
-                switch waterLevelEffect {
-                case "2":
-                    return "OBSTRN11"
+                if  featureRect.intersects(rect){
                     
-                case "4":
-                    return "OBSTRN03"
-                    
-                default:
-                    if let vSounding = Double(sounding){
-                        
-                        if vSounding > 20.0 {
-                            return "DANGER02"
-                        }else{
-                            return "DANGER01"       // Shoud put the sounding somewhere
+                    // OK now draw it
+                    var display = true
+                    if let f = feature as? S57Feature{  // Check if  minimum scale. Att 133 is minimum scle
+                        if let xscale = f.attributes[133]?.value{
+                            if let minScale = Double(xscale){
+                                display = minScale >= scale
+                            }
                         }
-                        
-                    }else {
-                        return "OBSTRN01"
+                    }
+                    
+                    if display {
+                        drawFeature(feature, rect: rect, fontBig: fontBig, fontSmall: fontSmall, zoomScale: zoomScale, context: context)
+                    }
+                }
+            }
+        }
+    }
+    
+    
+    private func drawFeature(_ feature : any S57Displayable, rect : MKMapRect, fontBig: CTFont, fontSmall: CTFont, zoomScale: MKZoomScale, context: CGContext){
+        
+        switch feature.prim {
+        case .point:
+            drawPoint(feature, rect: rect, fontBig: fontBig, fontSmall: fontSmall, zoomScale: zoomScale, context: context)
+            
+        case .line:
+            drawLine(feature, rect: rect, zoomScale: zoomScale, context: context)
+            
+        case .area:
+            drawArea(feature, rect: rect, zoomScale: zoomScale, context: context)
+            
+        default:
+            break
+        }
+        
+        if let feature = feature as? S57Feature {
+            
+            for ffpt in feature.ffpt{
+                
+                if let daugther = ffpt.feature{
+                    if ffpt.relationshipIndicator == .slave{
+                        drawFeature(daugther, rect: rect, fontBig: fontBig, fontSmall: fontSmall, zoomScale: zoomScale, context: context)
                     }
                 }
                 
             }
             
-        case 87:
-            return "OFSPLF01"
             
-        case 91:
-            return "PILBOP02"
+        }
+        
+    }
+    private func drawRect(_ rect : MKMapRect, zoomScale: MKZoomScale, context: CGContext ){
+        context.saveGState()
+        let boundingRect = self.rect(for: rect)
+        let mark = boundingRect//.insetBy(dx: boundingRect.width/10.0, dy: boundingRect.height/10.0)
+        context.setStrokeColor(red)
+        context.setFillColor(red)
+        context.setLineWidth(1 / zoomScale)
+        
+        context.addRect(mark)
+        context.drawPath(using: .stroke)
+        context.restoreGState()
+    }
+    
+    
+    
+    private func mapRect(_ feature : any S57Displayable, context : CGContext) -> MKMapRect?{
+        
+        if let f = feature as? S57Feature, f.objl == 129{
+            if let aRect = feature.region?.mapRect{
+                return aRect
+            }
+        }
+        
+        
+        switch feature.prim {
+        case .point:
+            let realSize = context.convertToUserSpace(CGSize(width: 20.0, height: 20.0))
+            let center  =  self.point(for: feature.point!) // Inc User coordinates
+            let aRect = CGRect(x: center.x - realSize.width / 2.0, y: center.y - realSize.height / 2.0, width: realSize.width, height: realSize.height)
+            return self.mapRect(for: aRect)
             
-        case 103:
-            return "RTPBCN02"
+        default:
             
-        case 105:
-            return "DRFSTA01"
-
-        case 112:   // restricted Area/
-            
-            let ctype = feature.attributes[131]?.value
-            
-            switch ctype {
-            case "1":
-                return "ACHRES51"
-                
-            default:
-                return "BOYDEF03"   // Acabar de posar valors
+            if let aRect = feature.region?.mapRect{
+                return (aRect)
             }
             
-        case 125:
-            let conspiscuous = feature.attributes[83]?.value ?? "" == "1"
-
-            return conspiscuous ? "SILBUI11" : "SILBUI01"
-             
-        case 144:   // Top Marks are not used asa they are already codified in beacon / buoy
-            return nil
-            
-        default:
+        }
         
-            return "X"  // Deault Not Found, a circle in black with magenta center
+        return  nil
+    }
+    
+    private func drawPoint(_ feature : any S57Displayable, rect : MKMapRect, fontBig: CTFont, fontSmall: CTFont, zoomScale: MKZoomScale, context: CGContext){
+        var imageName : String?
+        var text : String?
+        if let f = feature as? S57Feature{
+            
+            
+            if f.objl == 129{  // Sounding. IS a diffeerent way to do it
+                drawSounding(feature: f, rect: rect, font: fontSmall, context: context)
+                return
+                
+            }else{
+                imageName = S57PointRenderer.imageForFeature(f)
+                text = S57PointRenderer.textForFeature(f)
+            }
+        }
+        // ATENCIó: La mida dels simbols es estable independent del Zoom!!!
+        
+        if let point  = feature.point{
+            if let imageName = imageName {
+                drawImage(imageName, at: point, zoomScale: zoomScale, in: context)
+            }
+            if let text = text {
+                drawText(text, at: point, font: fontBig, in: context)
+            }
         }
         
     }
-        
-    static func textForFeature(_ feature : S57Feature) -> String?{
-        
-        switch feature.objl{
-  
-            
-        case 72: // Land Elevation
-            
-            return nil
-             
-        case 86, 159, 153:    // Obstruction, Wreck
-            let category = feature.attributes[42]?.value
-            let waterLevelEffect = feature.attributes[187]?.value ?? ""
-            let sounding = feature.attributes[179]?.value ?? ""
-            
-                switch waterLevelEffect {
-                case "2":
-                    return nil
-                    
-                case "4":
-                    return nil
-                    
-             
-                    
-                default:
-                    if let vSounding = Double(sounding){
-                        
-                        return sounding
-                        
-                    }else {
-                        return nil
+    
+    
+    private func drawSounding( feature : S57Feature, rect : MKMapRect, font: CTFont, context: CGContext){
+        for fspt in feature.fspt{
+            if let v = fspt.vector{
+                for coord in v.expandedCoordinates{
+                    if let value = coord.depth?.formatted() {
+                        let mapPoint = MKMapPoint(coord.coordinates)
+                        if rect.contains(mapPoint){
+                            drawText(value, at: mapPoint, font: font, in: context)
+                        }
                     }
                 }
-            
-        case 144:   // Top Marks are not used asa they are already codified in beacon / buoy
-            return nil
-            
-        default:
-        
-            return nil
+            }
         }
+    }
+    
+    
+    private func drawLine(_ feature : any S57Displayable, rect : MKMapRect,zoomScale: MKZoomScale, context: CGContext){
+        
+        context.saveGState()
+
+        if let points = feature.points{
+            
+            let p0 = points[0]
+            
+            context.beginPath()
+            
+            context.move(to: self.point(for: p0))
+            
+            for p in points[1...]{
+                context.addLine(to: self.point(for: p))
+            }
+            
+            context.setStrokeColor(S57PointRenderer.colorForItem(feature))
+            //context.setFillColor(red)
+            context.setLineWidth(1.0 / zoomScale)
+            
+            context.strokePath()
+            //context.fillPath()
+            
+        }
+        context.restoreGState()
+        
         
     }
     
-    static func borderArea(_ feature : S57Feature) -> (color: CGColor, width: CGFloat, dashes: [CGFloat])?{
+    private func drawArea(_ feature : any S57Displayable, rect : MKMapRect, zoomScale: MKZoomScale, context: CGContext){
         
-        switch feature.objl{
+        context.saveGState()
+        if let points = feature.points{
             
-        case 302, 306:
-            return (S57PointRenderer.colorForItem(feature), width: 2.0, dashes: [1.0])
-
-        case 86:
-            return (CGColor.black, width: 1.0, dashes: [1.0, 1.0])
-
-        default:
-            return nil
+            let p0 = points[0]
+            
+            context.beginPath()
+            
+            context.move(to: self.point(for: p0))
+            
+            for p in points[1...]{
+                context.addLine(to: self.point(for: p))
+            }
+            context.closePath()
+            
+            let storePath = context.path!
+            if let f = feature as? S57Feature {
+                if let dashes = S57PointRenderer.borderArea(f){
+                    context.setStrokeColor(dashes.color)
+                    context.setLineWidth(dashes.width / zoomScale)
+                    context.setLineDash(phase: 0.0, lengths: dashes.dashes.map{$0 / zoomScale})
+                    context.strokePath()
+                    
+                }
+                if S57PointRenderer.fillArea(f){
+                    context.addPath(storePath)
+                    context.setFillColor(S57PointRenderer.colorForItem(feature))
+                    context.fillPath()
+                }
+                
+                
+            }else{
+                context.setFillColor(S57PointRenderer.colorForItem(feature))
+                context.fillPath()
+            }
+        }
+        
+        // Now turn interior points transparent (hope)
+        
+        if let points = feature.interiorPoints{
+            
+            let p0 = points[0]
+            
+            context.beginPath()
+            
+            context.move(to: self.point(for: p0))
+            
+            for p in points[1...]{
+                context.addLine(to: self.point(for: p))
+            }
+            context.closePath()
+            context.setFillColor(CGColor.clear)
+            context.fillPath()
             
         }
-    }
-
-    // Return true if area should be filled
-
-    static func fillArea(_ feature : S57Feature) -> Bool{
         
-        switch feature.objl{
-            
-        case 302, 306:
-            return false
-            
-        
-            
-        default:
-            return true
-            
+        // Now draw an image at the center
+        if let f = feature as? S57Feature{
+            if let imageName = S57PointRenderer.imageForFeature(f){
+                if let point = f.center{
+                    drawImage(imageName, at: point, zoomScale: zoomScale, in: context)
+                }
+                
+            }
         }
+        
+        context.restoreGState()
     }
-
     
+    
+    
+    
+    
+    // Auxiliary function to draw a text at  point (centered)
+    private func drawText(_ text : String, at point : MKMapPoint, font: CTFont, in context : CGContext){
+        let cgPoint = self.point(for: point)
+        context.saveGState()
+        context.setTextDrawingMode(.fillStroke)
+        context.textMatrix = CGAffineTransformMakeScale(1.0, -1.0)
+        
+        // Parameters
+        
+        let color = CGColor.black
+        //let fontSize: CGFloat = size / zoomScale
+        // You can use the Font Book app to find the name
+        //let fontName = "Helvetica" as CFString // Chalk
+        //let font = CTFontCreateWithName(fontName, fontSize, nil)
+        
+        let attributes: [NSAttributedString.Key : Any] = [.font: font, .foregroundColor: color]
+        
+        // Text
+        
+        let string = text
+        let attributedString = NSAttributedString(string: string,
+                                                  attributes: attributes)
+        
+        // Render
+        
+        let line = CTLineCreateWithAttributedString(attributedString)
+        
+        let stringRect = CTLineGetImageBounds(line, context)
+        let x = cgPoint.x - stringRect.width / 2.0 - stringRect.origin.x
+        let y = cgPoint.y + stringRect.height / 2.0 + stringRect.origin.y
+        
+        context.textPosition = CGPoint(x: x, y: y)
+        
+        CTLineDraw(line, context)
+        context.restoreGState()
+        
+    }
+    
+    private func drawImage(_ imageName : String, at point : MKMapPoint, zoomScale: MKZoomScale, in context : CGContext){
+        context.saveGState()
+        
+#if os(macOS)
+        
+        
+        let cgPoint = self.point(for: point)
+        if let nsImage = NSImage(named: imageName){
+            let imageSize = nsImage.size
+            //et proposedSize = context.convertToUserSpace(imageSize)
+            //let relativeSize = 1.0
+            let baseSize = context.convertToUserSpace(imageSize)
+            let factor = 1.0
+            let someRect = CGRect(x: cgPoint.x - baseSize.width/2.0/factor, y: cgPoint.y - baseSize.height/2.0/factor, width: baseSize.width/factor, height: baseSize.height/factor)
+            
+            
+            let old = NSGraphicsContext.current
+            let nsContext = NSGraphicsContext(cgContext: context, flipped: true)
+            NSGraphicsContext.current = nsContext
+            nsImage.draw(in: someRect)
+            NSGraphicsContext.current = old
+            
+        }else{
+            
+            let d = 5.0 / zoomScale
+            let arect = CGRect(x: cgPoint.x-d, y: cgPoint.y-d, width: 2*d, height: 2*d)
+            context.setFillColor(magenta)
+            context.setStrokeColor(black)
+            context.setLineWidth( 1.0 / zoomScale)
+            context.addEllipse(in: arect)
+            context.drawPath(using: .fillStroke)
+        }
+        
+#elseif os(iOS)
+        
+        
+        let cgPoint = self.point(for: point)
+        
+        if let uiImage = UIImage(named: imageName){
+            let imageSize = uiImage.size
+            
+            context.saveGState()
+            
+            let baseSize = context.convertToUserSpace(imageSize)
+            let factor = 1.0
+            let someRect = CGRect(x: cgPoint.x - baseSize.width/2.0/factor, y: cgPoint.y - baseSize.height/2.0/factor, width: baseSize.width/factor, height: baseSize.height/factor)
+            
+            context.translateBy(x: 0, y: cgPoint.y)
+            context.scaleBy(x: 1.0, y: -1.0)
+            context.translateBy(x: 0, y: -cgPoint.y)
+            
+            if let cgimage = uiImage.cgImage {
+                context.draw(cgimage, in: someRect)
+            }
+            
+            context.restoreGState()
+        }else{
+            let d = 5.0 / zoomScale
+            
+            let rect = CGRect(x: cgPoint.x-d, y: cgPoint.y-d, width: 2*d, height: 2*d)
+            context.setFillColor(magenta)
+            context.setStrokeColor(black)
+            context.setLineWidth(1.0 / zoomScale)
+            context.addEllipse(in: rect)
+            context.drawPath(using: .fillStroke)
+        }
+#endif
+        context.restoreGState()
+    }
 }

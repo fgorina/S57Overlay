@@ -6,6 +6,6 @@ final class S57OverlayTests: XCTestCase {
         // This is an example of a functional test case.
         // Use XCTAssert and related functions to verify your tests produce the correct
         // results.
-        XCTAssertEqual(S57Overlay().text, "Hello, World!")
+        //XCTAssertEqual(S57Overlay().text, "Hello, World!")
     }
 }

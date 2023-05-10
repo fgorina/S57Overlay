@@ -16,6 +16,7 @@ import MapKit
 
 
 
+@available(macOS 10.15, *)
 struct S57PointRenderer {
     
     static func colorForItem(_ item : any S57Displayable) -> CGColor{
@@ -110,7 +111,6 @@ struct S57PointRenderer {
                 
             let ccategory = feature.attributes[36]?.value // Category
             // Idealment deuriem modificar en funció del tipus
-            var category = "Lateral_Pillar_PreferredChannel_Port"
             switch ccategory {
             case "1" :
                 return "BCNLAT15"
@@ -362,7 +362,7 @@ struct S57PointRenderer {
         case 86, 159, 153:    // Obstruction, Wreck
             let category = feature.attributes[42]?.value
             let waterLevelEffect = feature.attributes[187]?.value ?? ""
-            let sounding = feature.attributes[179]?.value ?? ""
+            let sounding = feature.attributes[179]?.value
             
                 switch waterLevelEffect {
                 case "2":
@@ -374,7 +374,7 @@ struct S57PointRenderer {
              
                     
                 default:
-                    if let vSounding = Double(sounding){
+                    if let sounding = sounding{
                         
                         return sounding
                         
