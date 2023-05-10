@@ -52,12 +52,13 @@ public class S57Overlay : NSObject, MKOverlay{
     }
 }
 
-@available(iOS 13.0, *)
+@available(iOS 15.0, *)
 @available(macOS 12.15, *)
 
 public class S57OverlayRenderer : MKOverlayRenderer {
     let red = CGColor(red: 1.0, green: 0.0, blue: 0.0, alpha: 1.0)
     let black = CGColor(red: 0.0, green: 0.0, blue: 0.0, alpha: 1.0)
+    let clear = CGColor(red: 1.0, green: 1.0, blue: 1.0, alpha: 0.0)
     let magenta = CGColor(red: 1.0, green: 0.0, blue: 1.0, alpha: 0.5)
     
     let fontName = "Futura" as CFString // Avenir
@@ -308,7 +309,7 @@ public class S57OverlayRenderer : MKOverlayRenderer {
                 context.addLine(to: self.point(for: p))
             }
             context.closePath()
-            context.setFillColor(CGColor.clear)
+            context.setFillColor(clear)
             context.fillPath()
             
         }
@@ -339,7 +340,7 @@ public class S57OverlayRenderer : MKOverlayRenderer {
         
         // Parameters
         
-        let color = CGColor.black
+        let color = black
         //let fontSize: CGFloat = size / zoomScale
         // You can use the Font Book app to find the name
         //let fontName = "Helvetica" as CFString // Chalk

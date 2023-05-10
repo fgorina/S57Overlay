@@ -16,6 +16,7 @@ import MapKit
 
 
 
+@available(iOS 13.0, *)
 @available(macOS 10.15, *)
 struct S57PointRenderer {
     
@@ -401,7 +402,7 @@ struct S57PointRenderer {
             return (S57PointRenderer.colorForItem(feature), width: 2.0, dashes: [1.0])
 
         case 86:
-            return (CGColor.black, width: 1.0, dashes: [1.0, 1.0])
+            return (CGColor(red: 0.0, green: 0.0, blue: 0.0, alpha: 1.0), width: 1.0, dashes: [1.0, 1.0])
 
         default:
             return nil
