@@ -61,7 +61,7 @@ public class S57OverlayRenderer : MKOverlayRenderer {
     let clear = CGColor(red: 1.0, green: 1.0, blue: 1.0, alpha: 0.0)
     let magenta = CGColor(red: 1.0, green: 0.0, blue: 1.0, alpha: 0.5)
     
-    let fontName = "Futura" as CFString // Avenir
+    let fontName = "Futura-Medium" as CFString // Avenir
     
     
     let contourColor = CGColor(red: 107.0/255.0, green: 118.0/155.0, blue: 107.0/256.0, alpha: 1.0)
