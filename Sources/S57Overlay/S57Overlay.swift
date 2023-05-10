@@ -377,7 +377,7 @@ public class S57OverlayRenderer : MKOverlayRenderer {
         
         let cgPoint = self.point(for: point)
         let bundle = Bundle.module
-        if  let url = bundle.url(forResource: imageName, withExtension: "svg"){
+        if  let url = bundle.urlForImageResource(imageName){
             if let nsImage = NSImage(contentsOf: url){
                 let imageSize = nsImage.size
                 //et proposedSize = context.convertToUserSpace(imageSize)
