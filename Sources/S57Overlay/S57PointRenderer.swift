@@ -203,6 +203,9 @@ struct S57PointRenderer {
                 return "BOYSPP11"
             }
             
+        case 42: // Depth Area
+            return  nil
+            
         case 58: // Fog Signal
             return "FOGSIG01"
             
@@ -351,6 +354,25 @@ struct S57PointRenderer {
             
         case 119:   // Sea Named Area
                 return nil
+            
+        case 121:   // Sea Bed Area
+            let nature = feature.attributes[113]?.value ?? ""
+            
+            switch nature{
+
+                case "9":
+                    return "RCKLDG01"
+                
+            case "11":
+                return "RCKLDG01"
+                
+                case "14":
+                    return "RCKLDG01"
+            default:
+                return nil
+            }
+            
+            
         case 125:
             let conspiscuous = feature.attributes[83]?.value ?? "" == "1"
 
@@ -360,7 +382,10 @@ struct S57PointRenderer {
             return nil
             
         case 158:   // Week / kelp
-            return "WEDKLP03" 
+            return "WEDKLP03"
+            
+        case 302: // Coverage
+            return nil
             
         default:
         
@@ -404,6 +429,53 @@ struct S57PointRenderer {
             
         case 73, 119:   // Land Region, Sea named Area
             return (feature.attributes[116]?.value)
+            
+        case 121:   // Sea Bed Area
+            let nature = feature.attributes[113]?.value ?? ""
+            
+            switch nature{
+                
+            case "1":
+                return "M"
+                
+                case "2":
+                    return "Cy"
+                
+                case "3":
+                    return "Si"
+                
+                case "4":
+                return "S"
+                
+                case "5":
+                    return "St"
+                
+                case "6":
+                return "G"
+                    
+                case "7":
+                return "P"
+                case "8":
+                    return "Cb"
+                
+                case "9":
+                    return nil
+                
+                case "11":
+                    return nil
+                case "14":
+                    return nil
+                
+                case "17":
+                    return "Sh"
+                
+                case "18":
+                    return "Bo"
+                
+            default:
+                return nil
+            }
+
         
         case 144:   // Top Marks are not used asa they are already codified in beacon / buoy
             return nil
@@ -419,13 +491,13 @@ struct S57PointRenderer {
         
         switch feature.objl{
             
-        case 302, 306:
+        case 302, 306, 308, 81 :
             return (S57PointRenderer.colorForItem(feature), width: 2.0, dashes: [1.0])
 
         case 112:   // restricted Area/
             return (S57PointRenderer.colorForItem(feature), width: 2.0, dashes: [8.0, 2.0])
             
-       
+      
         case 86:
             return (CGColor(red: 0.0, green: 0.0, blue: 0.0, alpha: 1.0), width: 1.0, dashes: [1.0, 1.0])
 
@@ -443,7 +515,7 @@ struct S57PointRenderer {
             
         case 73 : // Land region
             return false
-        case 302, 306:
+        case 302, 306, 308, 81:
             return false
             
         case 112:
