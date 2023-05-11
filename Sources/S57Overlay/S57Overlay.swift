@@ -119,7 +119,7 @@ public class S57OverlayRenderer : MKOverlayRenderer {
             drawLine(feature, rect: rect, zoomScale: zoomScale, context: context)
             
         case .area:
-            drawArea(feature, rect: rect, zoomScale: zoomScale, context: context)
+            drawArea(feature, rect: rect, zoomScale: zoomScale, font: fontBig, context: context)
             
         default:
             break
@@ -246,7 +246,7 @@ public class S57OverlayRenderer : MKOverlayRenderer {
         context.restoreGState()
     }
     
-    private func drawArea(_ feature : any S57Displayable, rect : MKMapRect, zoomScale: MKZoomScale, context: CGContext){
+    private func drawArea(_ feature : any S57Displayable, rect : MKMapRect, zoomScale: MKZoomScale, font: CTFont, context: CGContext){
         
         context.saveGState()
         if let points = feature.points{
@@ -303,14 +303,23 @@ public class S57OverlayRenderer : MKOverlayRenderer {
             
         }
         
-        // Now draw an image at the center
+        // Now draw an image or text at the center
         if let f = feature as? S57Feature{
             if let imageName = S57PointRenderer.imageForFeature(f){
                 if let point = f.center{
                     drawImage(imageName, at: point, zoomScale: zoomScale, in: context)
                 }
             }
+            
+            if let text = S57PointRenderer.textForFeature(f){
+                if let point = f.center{
+                    drawText(text, at: point, font: font, in: context)
+                }
+
+            }
         }
+        
+        
         
         context.restoreGState()
     }
