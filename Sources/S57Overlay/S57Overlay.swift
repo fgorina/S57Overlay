@@ -92,12 +92,8 @@ public class S57OverlayRenderer : MKOverlayRenderer {
                     
                     // OK now draw it
                     var display = true
-                    if let f = feature as? S57Feature{  // Check if  minimum scale. Att 133 is minimum scle
-                        if let xscale = f.attributes[133]?.value{
-                            if let minScale = Double(xscale){
-                                display = minScale >= scale
-                            }
-                        }
+                    if feature.minScale != 0{
+                        display = feature.minScale >= scale
                     }
                     
                     if display {
@@ -318,8 +314,6 @@ public class S57OverlayRenderer : MKOverlayRenderer {
 
             }
         }
-        
-        
         
         context.restoreGState()
     }
