@@ -402,7 +402,7 @@ struct S57PointRenderer {
                     }
                 }
             
-        case 119:   // Sea named Area
+        case 73, 119:   // Land Region, Sea named Area
             return (feature.attributes[116]?.value)
         
         case 144:   // Top Marks are not used asa they are already codified in beacon / buoy
@@ -441,6 +441,8 @@ struct S57PointRenderer {
         
         switch feature.objl{
             
+        case 73 : // Land region
+            return false
         case 302, 306:
             return false
             
