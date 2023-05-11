@@ -20,12 +20,12 @@ public enum S57OverlayError : Error{
 
 public class S57Overlay : NSObject, MKOverlay{
     
-    
+    static let iconSize : CGSize = CGSize(width: 20.0, height: 20.0)
     public var coordinate: CLLocationCoordinate2D
     public var boundingMapRect: MKMapRect
     
     
-    var features : [any S57Displayable]
+    public var features : [any S57Displayable]
     
     public init(_ features : [any S57Displayable])  throws {
         
@@ -134,12 +134,8 @@ public class S57OverlayRenderer : MKOverlayRenderer {
                         drawFeature(daugther, rect: rect, fontBig: fontBig, fontSmall: fontSmall, zoomScale: zoomScale, context: context)
                     }
                 }
-                
             }
-            
-            
-        }
-        
+         }
     }
     private func drawRect(_ rect : MKMapRect, zoomScale: MKZoomScale, context: CGContext ){
         context.saveGState()
@@ -167,7 +163,7 @@ public class S57OverlayRenderer : MKOverlayRenderer {
         
         switch feature.prim {
         case .point:
-            let realSize = context.convertToUserSpace(CGSize(width: 20.0, height: 20.0))
+            let realSize = context.convertToUserSpace(CGSize(width: S57Overlay.iconSize.width, height: S57Overlay.iconSize.height))
             let center  =  self.point(for: feature.point!) // Inc User coordinates
             let aRect = CGRect(x: center.x - realSize.width / 2.0, y: center.y - realSize.height / 2.0, width: realSize.width, height: realSize.height)
             return self.mapRect(for: aRect)
@@ -179,7 +175,6 @@ public class S57OverlayRenderer : MKOverlayRenderer {
             }
             
         }
-        
         return  nil
     }
     
@@ -245,16 +240,10 @@ public class S57OverlayRenderer : MKOverlayRenderer {
             }
             
             context.setStrokeColor(S57PointRenderer.colorForItem(feature))
-            //context.setFillColor(red)
             context.setLineWidth(1.0 / zoomScale)
-            
             context.strokePath()
-            //context.fillPath()
-            
         }
         context.restoreGState()
-        
-        
     }
     
     private func drawArea(_ feature : any S57Displayable, rect : MKMapRect, zoomScale: MKZoomScale, context: CGContext){
@@ -320,7 +309,6 @@ public class S57OverlayRenderer : MKOverlayRenderer {
                 if let point = f.center{
                     drawImage(imageName, at: point, zoomScale: zoomScale, in: context)
                 }
-                
             }
         }
         
