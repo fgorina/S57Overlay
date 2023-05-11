@@ -332,8 +332,14 @@ struct S57PointRenderer {
             case "1":
                 return "ACHRES51"
                 
+            case "3", "4":
+                return "FSHRES51"
+                
+            case "7", "8":
+                return"ENTRES51"
+                
             default:
-                return "BOYDEF03"   // Acabar de posar valors
+                return "INFARE51"  // Acabar de posar valors
             }
             
         case 125:
