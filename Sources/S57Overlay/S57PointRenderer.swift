@@ -51,6 +51,8 @@ struct S57PointRenderer {
             case 86:    // Obstruction
                 return CGColor(red: 129.0/255.0, green: 194.0/255.0, blue: 225.0/255.0, alpha: 1.0)
                 
+            case 119:   // Sea Named Area
+                return CGColor(red: 1.0, green: 0.0, blue: 1.0, alpha: 0.3)
                 
             case 121:       // Sea Bed Area
                 let v = f.attributes[187]?.value ?? "0"
@@ -229,6 +231,8 @@ struct S57PointRenderer {
             
             return "POSGEN04"
             
+        case 73: // Land Region
+            return nil  // Not aso sure
             
         case 74:    // Landmark
             let ctype = feature.attributes[35]?.value
@@ -345,6 +349,8 @@ struct S57PointRenderer {
                 return "INFARE51"  // Acabar de posar valors
             }
             
+        case 119:   // Sea Named Area
+                return nil
         case 125:
             let conspiscuous = feature.attributes[83]?.value ?? "" == "1"
 
@@ -396,6 +402,9 @@ struct S57PointRenderer {
                     }
                 }
             
+        case 119:   // Sea named Area
+            return (feature.attributes[116]?.value)
+        
         case 144:   // Top Marks are not used asa they are already codified in beacon / buoy
             return nil
             
@@ -416,6 +425,7 @@ struct S57PointRenderer {
         case 112:   // restricted Area/
             return (S57PointRenderer.colorForItem(feature), width: 2.0, dashes: [8.0, 2.0])
             
+       
         case 86:
             return (CGColor(red: 0.0, green: 0.0, blue: 0.0, alpha: 1.0), width: 1.0, dashes: [1.0, 1.0])
 
