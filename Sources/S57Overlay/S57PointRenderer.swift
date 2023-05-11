@@ -222,6 +222,9 @@ struct S57PointRenderer {
                 return "SMCFAC02"
             }
             
+        case 71:    // Land Area
+            return nil
+            
         case 72: // Land Elevation
             
             return "POSGEN04"
