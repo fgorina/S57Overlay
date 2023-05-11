@@ -36,7 +36,7 @@ struct S57PointRenderer {
             case 13:    // Build Area
                 return CGColor(red: 181.0/255.0, green: 147.0/255.0, blue: 59.0/255.0, alpha: 1.0)
                 
-            case 42:    // Depth Area
+            case 42, 46:    // Depth Area - Dredged area. Should mark it somehow
                 let v = Double(f.attributes[87]?.value ?? "0") ?? 0.0 // Minimum value
                 
                 if v >= 30.0 {
@@ -203,7 +203,7 @@ struct S57PointRenderer {
                 return "BOYSPP11"
             }
             
-        case 42: // Depth Area
+        case 42, 46: // Depth Area and Dredged Area
             return  nil
             
         case 58: // Fog Signal
