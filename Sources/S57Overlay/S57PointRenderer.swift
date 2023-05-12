@@ -356,6 +356,8 @@ struct S57PointRenderer {
                 return "INFARE51"  // Acabar de posar valors
             }
             
+        case 116: // Road
+            return  nil
         case 119:   // Sea Named Area
                 return nil
             
