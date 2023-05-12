@@ -370,7 +370,9 @@ public class S57OverlayRenderer : MKOverlayRenderer {
         let cgPoint = self.point(for: point)
         
       
-        if let nsImage = ImageCacher.current.image(named: imageName) { //bundle.image(forResource: imageName){
+        //if let nsImage = ImageCacher.current.image(named: imageName) { 
+            
+        if let nsImage = Bundle.module.image(forResource: imageName){
                 let imageSize = nsImage.size
                 //et proposedSize = context.convertToUserSpace(imageSize)
                 //let relativeSize = 1.0
