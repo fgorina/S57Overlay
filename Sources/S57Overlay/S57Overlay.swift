@@ -25,6 +25,7 @@ public class S57Overlay : NSObject, MKOverlay{
     public var boundingMapRect: MKMapRect
     
     
+    
     public var features : [any S57Displayable]
     
     public init(_ features : [any S57Displayable])  throws {
@@ -48,7 +49,7 @@ public class S57Overlay : NSObject, MKOverlay{
     }
     
     public func canReplaceMapContent() -> Bool {
-        return true
+        return false
     }
 }
 
