@@ -282,7 +282,7 @@ struct S57PointRenderer {
                 
             }
             
-        case 81:
+        case 81:    // Magnetic Variation
             return "MAGVAR01"
             
         case 82:    // Fish Factory
@@ -376,6 +376,8 @@ struct S57PointRenderer {
                 return nil
             }
             
+        case 122 : // Shoreline Construction
+            return nil
             
         case 125:
             let conspiscuous = feature.attributes[83]?.value ?? "" == "1"
