@@ -141,6 +141,10 @@ struct S57PointRenderer {
         case 12:    // Building, single
             return "BUISGL01"       // Add treatment for function
             
+        case 13:    // Build Area
+            return nil      // Add treatment for function
+            
+
         case 14: // Buoy Cardinal
             let category = feature.attributes[13]?.value ?? "" // Category
             return "BOYCAR0\(category)"
