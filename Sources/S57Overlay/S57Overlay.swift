@@ -48,7 +48,7 @@ public class S57Overlay : NSObject, MKOverlay{
     }
     
     public func canReplaceMapContent() -> Bool {
-        return false
+        return true
     }
 }
 
