@@ -6,6 +6,7 @@
 //
 
 import Foundation
+#if os(macOS)
 import AppKit
 
 class ImageCacher {
@@ -31,3 +32,4 @@ class ImageCacher {
         return nil
     }
 }
+#endif
