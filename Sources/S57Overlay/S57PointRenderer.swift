@@ -386,6 +386,9 @@ struct S57PointRenderer {
 
             return conspiscuous ? "SILBUI11" : "SILBUI01"
              
+        case 129:
+            return nil
+            
         case 144:   // Top Marks are not used asa they are already codified in beacon / buoy
             return nil
             
