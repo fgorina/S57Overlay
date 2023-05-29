@@ -502,6 +502,9 @@ struct S57PointRenderer {
         
         switch feature.objl{
             
+        case 4:
+            return (S57PointRenderer.colorForItem(feature), width: 2.0, dashes: [8.0, 2.0])
+            
         case 302, 306, 308, 81 :
             return (S57PointRenderer.colorForItem(feature), width: 2.0, dashes: [1.0])
 
@@ -521,8 +524,13 @@ struct S57PointRenderer {
     // Return true if area should be filled
 
     static func fillArea(_ feature : S57Feature) -> Bool{
-        
+
+
         switch feature.objl{
+            
+        case 4 :        // Anchorage Area
+            return false
+
             
         case 73 : // Land region
             return false
@@ -531,6 +539,7 @@ struct S57PointRenderer {
             
         case 112:
             return false
+            
             
         default:
             return true
