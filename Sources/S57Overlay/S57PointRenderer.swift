@@ -508,12 +508,13 @@ struct S57PointRenderer {
         case 302, 306, 308, 81 :
             return (S57PointRenderer.colorForItem(feature), width: 2.0, dashes: [1.0])
 
-        case 112:   // restricted Area/
-            return (S57PointRenderer.colorForItem(feature), width: 2.0, dashes: [8.0, 2.0])
-            
-      
         case 86:
             return (CGColor(red: 0.0, green: 0.0, blue: 0.0, alpha: 1.0), width: 1.0, dashes: [1.0, 1.0])
+
+        case 112:   // restricted Area/
+            return (S57PointRenderer.colorForItem(feature), width: 2.0, dashes: [8.0, 2.0])
+        
+      
 
         default:
             return nil
@@ -538,6 +539,9 @@ struct S57PointRenderer {
             return false
             
         case 112:
+            return false
+        
+        case 119:
             return false
             
             
