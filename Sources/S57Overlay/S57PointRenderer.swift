@@ -503,7 +503,7 @@ struct S57PointRenderer {
         switch feature.objl{
             
         case 4:
-            return (S57PointRenderer.colorForItem(feature), width: 2.0, dashes: [8.0, 2.0])
+            return (S57PointRenderer.colorForItem(feature), width: 1.0, dashes: [8.0, 2.0])
             
         case 302, 306, 308, 81 :
             return (S57PointRenderer.colorForItem(feature), width: 2.0, dashes: [1.0])
